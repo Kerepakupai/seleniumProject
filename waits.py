@@ -1,5 +1,6 @@
 import unittest
 from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -11,7 +12,9 @@ class CompareProducts(unittest.TestCase):
     @classmethod
     def setUp(cls) -> None:
         service = Service(executable_path="./chromedriver.exe")
-        cls.driver = webdriver.Chrome(service=service)
+        options = Options()
+        options.headless = True
+        cls.driver = webdriver.Chrome(service=service, options=options)
         driver = cls.driver
         driver.maximize_window()
         driver.get("http://demo-store.seleniumacademy.com/")
