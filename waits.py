@@ -3,8 +3,6 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 
 class CompareProducts(unittest.TestCase):
@@ -13,29 +11,34 @@ class CompareProducts(unittest.TestCase):
     def setUp(cls) -> None:
         service = Service(executable_path="./chromedriver.exe")
         options = Options()
-        options.headless = True
+        # options.headless = True
         cls.driver = webdriver.Chrome(service=service, options=options)
         driver = cls.driver
         driver.maximize_window()
-        driver.get("http://demo-store.seleniumacademy.com/")
+        driver.get("https://the-internet.herokuapp.com/")
         driver.implicitly_wait(15)
+        driver.find_element(by=By.LINK_TEXT, value="Disappearing Elements").click()
 
-    def test_account_link(self):
-        WebDriverWait(self.driver, 10).until(
-            lambda s: s.find_element(by=By.ID, value="select-language").get_attribute('length') == '3')
+    def test_name_elements(self):
+        driver = self.driver
+        options = []
+        menu = 5
+        tries = 1
 
-        account = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.LINK_TEXT, "ACCOUNT")))
-        account.click()
+        while len(options) < menu:
+            options.clear()
 
-    def test_create_new_customer(self):
-        self.driver.find_element(by=By.LINK_TEXT, value="ACCOUNT").click()
-        my_account = WebDriverWait(self.driver, 10).until(EC.visibility_of_element_located((By.LINK_TEXT, "My Account")))
-        my_account.click()
+            for i in range(menu):
+                try:
+                    option_name = driver.find_element(by=By.XPATH, value=f"//ul/li[{i+1}]/a")
+                    options.append(option_name.text)
+                    print(options)
+                except:
+                    print(f"Option {i+1} not found")
+                    tries += 1
+                    driver.refresh()
 
-        create_account_button = WebDriverWait(self.driver, 20).until(EC.element_to_be_clickable((By.LINK_TEXT, "CREATE AN ACCOUNT")))
-        create_account_button.click()
-
-        WebDriverWait(self.driver, 10).until(EC.title_contains("Create New Customer Account"))
+            print(f"Finished in {tries} tries")
 
     @classmethod
     def tearDown(cls) -> None:
